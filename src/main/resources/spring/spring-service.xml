@@ -1,0 +1,51 @@
+<?xml version = "1.0" encoding = "UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.1.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd" default-lazy-init="false">
+
+	<!-- 扫描Service包下的所有的添加注解的类 -->
+	<context:component-scan base-package="com.seckill.service" use-default-filters="false"/>
+
+	<!-- 配置事务管理器 -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<!-- 注入数据库的连接池 -->
+		<!-- 虽然引用的DataSource 不在当前的配置xml中， 但是当运行时同时加载两个配置文件， 会自动找到DataSource -->
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+
+	<!-- 配置基于注解的声明式事务 默认使用注解来管理事务行为 -->
+
+	<tx:annotation-driven transaction-manager="transactionManager" />
+
+	<!-- 6, 配置通知 -->
+	<!-- <tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			所有以query开头的方法是只读的
+			<tx:method name="query*" read-only="true" />
+			其他方法使用默认的事务设置
+			<tx:method name="insert*" />
+			<tx:method name="add*"/>
+			<tx:method name="update*"/>
+			<tx:method name="delete*"/>
+			<tx:method name="remove*"/>
+		</tx:attributes>
+	</tx:advice> -->
+
+	<!-- 7, 启用以上的事务通知 -->
+	<!-- <aop:config>
+		运行被定义在UserServiceImpl类下的任意方法
+		<aop:pointcut
+			expression="execution(* com.seckill.service.impl..*.*(..))"
+			id="aopCut" />
+		将切入点与通知编织在一起
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="aopCut" />
+	</aop:config> -->
+	
+</beans>

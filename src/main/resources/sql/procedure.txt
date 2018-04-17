@@ -1,0 +1,59 @@
+create PROCEDURE seckill_execute_pro(
+	in v_seckill_id BIGINT, in v_phone BIGINT,
+	in v_kill_time TIMESTAMP , out r_result INT
+)
+BEGIN
+	DECLARE insert_count int default 0;
+	start TRANSACTION;
+	insert ignore into success_killed(
+		seckill_id,user_phone,create_time
+	) values(v_seckill_id,v_phone,v_kill_time);
+	select ROW_COUNT() into insert_count;
+	if(insert_count=0) THEN
+	ROLLBACK;
+	set r_result = -1;
+	ELSEIF(insert_count<0) THEN
+	ROLLBACK;
+	set r_result = -2;
+	ELSE
+		update seckill set number = number -1
+		where start_time<v_kill_time and end_time > v_kill_time and number >0;
+		select ROW_COUNT() into insert_count;
+		if(insert_count=0) THEN
+		ROLLBACK;
+		set r_result = 0;
+		ELSEIF(insert_count<0) THEN
+		ROLLBACK;
+		set r_result = -1;
+		ELSE
+		commit;
+		set r_result = 1;
+		end if ;
+	end if;
+end;
+
+set @r_result = -3;
+call seckill_execute_pro(3,15523326652,now(),@r_result);
+
+select @r_result
+
+
+
+CREATE TABLE user(
+	user_id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '用户ID',
+	user_name varchar(10) NOT NULL COMMENT '姓名',
+	sex TINYINT NOT NULL COMMENT '0:保密 1:男 2:女',
+	user_iden varchar(18) NOT NULL UNIQUE COMMENT '身份证号',
+	state TINYINT NOT NULL COMMENT '状态',
+	remark VARCHAR(255) NOT NULL COMMENT '备注',
+	KEY user_user_name (user_name),
+	KEY user_user_iden (user_iden)
+)ENGINE=INNODB AUTO_INCREMENT=100000000001 DEFAULT CHARSET=UTF8 COMMENT '用户表';
+
+insert into user (user_name,sex,user_iden,state,remark)
+
+values ('Gaint',0,'410425199810251136',1,'No Remark');
+
+select * from user;
+
+		
